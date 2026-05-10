@@ -1,111 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grupo de Assobios</title>
-
-<style>
-body{
-  background:#111;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-  padding:20px;
-}
-
-.box{
-  background:#222;
-  padding:20px;
-  border-radius:20px;
-  max-width:700px;
-  margin:auto;
-}
-
-input{
-  width:70%;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-}
-
-button{
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:limegreen;
-  color:white;
-  cursor:pointer;
-}
-
-li{
-  list-style:none;
-  background:#333;
-  margin:10px;
-  padding:10px;
-  border-radius:10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="box">
-
-<h1>📢 Grupo de Assobios</h1>
-
-<input id="ruleInput" placeholder="Escreve uma regra">
-<button onclick="addRule()">Adicionar</button>
-
-<ul id="rules"></ul>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAjsBEsMvB8DOAQuuy3OoqVuc1rJndBh4A",
-  authDomain: "assobio-32dc1.firebaseapp.com",
-  projectId: "assobio-32dc1",
-  storageBucket: "assobio-32dc1.appspot.com",
-  messagingSenderId: "632711724733",
-  appId: "1:632711724733:web:9e686877df41fe2c8ac1d4",
-  measurementId: "G-QEM1B6KK4Y"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.addRule = async function () {
-  const input = document.getElementById("ruleInput");
-
-  if (input.value.trim() !== "") {
-    await addDoc(collection(db, "rules"), {
-      text: input.value,
-      time: Date.now()
-    });
-
-    input.value = "";
-  }
-};
-
-const rulesList = document.getElementById("rules");
-
-onSnapshot(collection(db, "rules"), (snapshot) => {
-  rulesList.innerHTML = "";
-
-  snapshot.forEach((doc) => {
-    const li = document.createElement("li");
-    li.textContent = doc.data().text;
-    rulesList.appendChild(li);
-  });
-});
-
-</script>
-
-</body>
-</html>
+<!DOCTYPE html>  
+<html lang="pt">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Grupo de Assobios</title>  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      background: #111;  
+      color: #fff;  
+      text-align: center;  
+      padding: 20px;  
+    }  
+    .container {  
+      max-width: 600px;  
+      margin: 0 auto;  
+      background: #1e1e1e;  
+      padding: 20px;  
+      border-radius: 15px;  
+    }  
+    input {  
+      width: 80%;  
+      padding: 12px;  
+      border-radius: 8px;  
+      border: none;  
+      font-size: 16px;  
+    }  
+    button {  
+      padding: 12px 20px;  
+      margin: 10px 5px;  
+      border: none;  
+      border-radius: 8px;  
+      font-size: 16px;  
+      cursor: pointer;  
+    }  
+    .add-btn { background: #28a745; color: white; }  
+    .delete-btn {  
+      background: #dc3545;  
+      color: white;  
+      padding: 5px 10px;  
+      font-size: 14px;  
+      margin-left: 10px;  
+    }  
+    .rule {  
+      background: #2a2a2a;  
+      margin: 10px auto;  
+      padding: 12px;  
+      border-radius: 8px;  
+      display: flex;  
+      justify-content: space-between;  
+      align-items: center;  
+      max-width: 90%;  
+    }  
+  </style>  
+</head>  
+<body>  
+  <div class="container">  
+    <h1>📢 Grupo de Assobios</h1>  
+      
+    <input type="text" id="regraInput" placeholder="Escreve uma regra">  
+    <button class="add-btn" onclick="adicionarRegra()">Adicionar</button>  
+  
+    <div id="listaRegras"></div>  
+  </div>  
+  
+  <script>  
+    let regras = JSON.parse(localStorage.getItem('regras')) || [];  
+  
+    function renderizarRegras() {  
+      const lista = document.getElementById('listaRegras');  
+      lista.innerHTML = '';  
+  
+      regras.forEach((regra, index) => {  
+        const div = document.createElement('div');  
+        div.className = 'rule';  
+        div.innerHTML = `  
+          <span>${regra}</span>  
+          <button class="delete-btn" onclick="apagarRegra(${index})">🗑 Apagar</button>  
+        `;  
+        lista.appendChild(div);  
+      });  
+    }  
+  
+    function adicionarRegra() {  
+      const input = document.getElementById('regraInput');  
+      const texto = input.value.trim();  
+  
+      if (texto === '') return;  
+  
+      regras.push(texto);  
+      localStorage.setItem('regras', JSON.stringify(regras));  
+      input.value = '';  
+      renderizarRegras();  
+    }  
+  
+    function apagarRegra(index) {  
+      if (confirm('Tem certeza que quer apagar esta regra?')) {  
+        regras.splice(index, 1);  
+        localStorage.setItem('regras', JSON.stringify(regras));  
+        renderizarRegras();  
+      }  
+    }  
+  
+    // Carregar regras ao abrir a página  
+    renderizarRegras();  
+  </script>  
+</body>  
+</html>  
